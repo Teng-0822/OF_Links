@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Medieval Links</title>
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'MedievalSharp', cursive;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff3dc;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      margin-top: 20px;
+      text-shadow: 2px 2px #000;
+    }
+    .container {
+      display: flex;
+      justify-content: space-around;
+      padding: 20px;
+    }
+    .column {
+      width: 45%;
+      background: rgba(51, 36, 21, 0.8);
+      border: 5px solid #c2a675;
+      border-radius: 12px;
+      padding: 15px;
+    }
+    .column h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #fff3dc;
+      color: #000;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    li a {
+      text-decoration: none;
+      color: inherit;
+      flex-grow: 1;
+    }
+    .delete-btn {
+      cursor: pointer;
+      background: darkred;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .add-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background-color: #c2a675;
+      border: 3px solid #fff3dc;
+      border-radius: 50%;
+      font-size: 28px;
+      color: black;
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
+      text-align: center;
+      line-height: 55px;
+      box-shadow: 0 0 10px #000;
+    }
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: url('https://i.imgur.com/gnEF0q1.png');
+      background-size: cover;
+      padding: 25px;
+      width: 300px;
+      border: 5px solid #c2a675;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #000;
+    }
+    .user-select {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 10px;
+    }
+    .user-btn {
+      padding: 8px 16px;
+      background: #fff3dc;
+      border: 2px solid #c2a675;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .user-btn.active {
+      background: #c2a675;
+      color: #000;
+    }
+    input {
+      width: 100%;
+      margin: 8px 0;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #333;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .modal-actions button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #music-toggle {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: rgba(0,0,0,0.5);
+      border: none;
+      color: #fff3dc;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <h1>Links of Knights</h1>
+  <button id="music-toggle">🔇</button>
+  <div class="container">
+    <div class="column">
+      <h2>Sam Etkins</h2>
+      <ul id="sam-list"></ul>
+    </div>
+    <div class="column">
+      <h2>Stuart Garside</h2>
+      <ul id="stuart-list"></ul>
+    </div>
+  </div>
+  <button class="add-button" onclick="openModal()">+</button>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <div class="user-select">
+        <button class="user-btn" onclick="selectUser('Sam Etkins')">Sam</button>
+        <button class="user-btn" onclick="selectUser('Stuart Garside')">Stuart</button>
+      </div>
+      <input type="text" id="title" placeholder="Enter title" />
+      <input type="url" id="url" placeholder="Enter URL" />
+      <div class="modal-actions">
+        <button onclick="closeModal()">Cancel</button>
+        <button onclick="saveLink()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio -->
+  <audio id="bg-music" src="Music.mp3" loop></audio>
+  <audio id="sfx" src="Swordclash.mp3"></audio>
+
+  <script>
+    const samList = document.getElementById('sam-list');
+    const stuartList = document.getElementById('stuart-list');
+    const modal = document.getElementById('modal');
+    const titleInput = document.getElementById('title');
+    const urlInput = document.getElementById('url');
+    const userBtns = document.querySelectorAll('.user-btn');
+    const sfx = document.getElementById('sfx');
+    const music = document.getElementById('bg-music');
+    const musicToggle = document.getElementById('music-toggle');
+
+    let selectedUser = '';
+
+    const playSFX = () => {
+      sfx.currentTime = 0;
+      sfx.play();
+    };
+
+    function openModal() {
+      modal.style.display = 'flex';
+      playSFX();
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+      titleInput.value = '';
+      urlInput.value = '';
+      userBtns.forEach(btn => btn.classList.remove('active'));
+      selectedUser = '';
+    }
+
+    function selectUser(user) {
+      selectedUser = user;
+      userBtns.forEach(btn => {
+        if (btn.textContent === user.split(' ')[0]) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    function saveLink() {
+      if (!selectedUser || !titleInput.value || !urlInput.value) return alert("Fill all fields");
+      const link = { title: titleInput.value, url: urlInput.value };
+      const key = selectedUser === 'Sam Etkins' ? 'samLinks' : 'stuartLinks';
+      const links = JSON.parse(localStorage.getItem(key) || '[]');
+      links.push(link);
+      localStorage.setItem(key, JSON.stringify(links));
+      renderLinks();
+      closeModal();
+      playSFX();
+    }
+
+    function deleteLink(user, index) {
+      const key = user === 'Sam Etkins' ? 'samLinks' : 'stuartLinks';
+      const links = JSON.parse(localStorage.getItem(key) || '[]');
+      links.splice(index, 1);
+      localStorage.setItem(key, JSON.stringify(links));
+      renderLinks();
+      playSFX();
+    }
+
+    function renderLinks() {
+      samList.innerHTML = '';
+      stuartList.innerHTML = '';
+      const samLinks = JSON.parse(localStorage.getItem('samLinks') || '[]');
+      const stuartLinks = JSON.parse(localStorage.getItem('stuartLinks') || '[]');
+
+      samLinks.forEach((link, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="${link.url}" target="_blank">${link.title}</a> <button class="delete-btn" onclick="deleteLink('Sam Etkins', ${index})">×</button>`;
+        samList.appendChild(li);
+      });
+
+      stuartLinks.forEach((link, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="${link.url}" target="_blank">${link.title}</a> <button class="delete-btn" onclick="deleteLink('Stuart Garside', ${index})">×</button>`;
+        stuartList.appendChild(li);
+      });
+    }
+
+    musicToggle.addEventListener('click', () => {
+      if (music.paused) {
+        music.play();
+        musicToggle.textContent = '🎵';
+      } else {
+        music.pause();
+        musicToggle.textContent = '🔇';
+      }
+    });
+
+    renderLinks();
+  </script>
+</body>
+</html>
